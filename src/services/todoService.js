@@ -1,79 +1,96 @@
-// src/services/todoService.js
+const BASE_URL = "https://playground.4geeks.com/todo";
 
-const USERNAME = "tu_usuario"; // 👈 cambia por tu usuario real
-const BASE_URL = `https://playground.4geeks.com/todo/todos/${USERNAME}`;
-
-/**
- * 🟢 Obtiene todas las tareas del servidor
- */
-export const getTodos = async () => {
+export const getAllUsers = async () => {
   try {
-    const resp = await fetch(BASE_URL);
-    if (!resp.ok) throw new Error("Error al obtener tareas");
-    return await resp.json();
-  } catch (error) {
-    console.error("❌ Error en getTodos:", error);
-    throw error;
-  }
-};
-
-/**
- * ➕ Crea una nueva tarea en el servidor
- */
-export const addTodo = async (label) => {
-  try {
-    const task = { label, is_done: false };
-
-    const resp = await fetch(BASE_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(task),
+    const resp = await fetch(`${BASE_URL}/users`, {
+      method: "GET",
+      headers: { accept: "application/json" },
     });
-
-    if (!resp.ok) throw new Error("Error al agregar tarea");
-    return await resp.json();
-  } catch (error) {
-    console.error("❌ Error en addTodo:", error);
-    throw error;
+    if (!resp.ok) throw new Error();
+    const data = await resp.json();
+    return data.users || [];
+  } catch {
+    return [];
   }
 };
 
-/**
- * ❌ Elimina una tarea individual por ID
- */
-export const deleteTodo = async (id) => {
+export const createUserIfNotExists = async (username) => {
   try {
-    const resp = await fetch(`${BASE_URL}/${id}`, { method: "DELETE" });
-    if (!resp.ok) throw new Error("Error al eliminar tarea");
-    return true;
-  } catch (error) {
-    console.error("❌ Error en deleteTodo:", error);
-    throw error;
-  }
-};
-
-/**
- * 🧹 Elimina todas las tareas del usuario
- */
-export const clearAllTodos = async () => {
-  try {
-    const resp = await fetch(`${BASE_URL}/all`, { method: "DELETE" });
-    if (!resp.ok) throw new Error("Error al eliminar todas las tareas");
-    return true;
-  } catch (error) {
-    console.error("❌ Error en clearAllTodos:", error);
-    throw error;
-  }
-};
-
-export const createUser = async () => {
-  try {
-    const resp = await fetch(`https://playground.4geeks.com/todo/users/${USERNAME}`, {
+    const resp = await fetch(`${BASE_URL}/users/${username}`, {
       method: "POST",
+      headers: { accept: "application/json" },
     });
-    if (!resp.ok) console.warn("⚠️ El usuario ya existe o hubo un error");
     return await resp.json();
-  } catch (error) {
-    console.error("❌ Error en createUser:", error);
+  } catch {
+    return null;
+  }
+};
+
+export const deleteUser = async (username) => {
+  try {
+    const resp = await fetch(`${BASE_URL}/users/${username}`, {
+      method: "DELETE",
+      headers: { accept: "application/json" },
+    });
+    return resp.status === 204;
+  } catch {
+    return false;
+  }
+};
+
+export const getTodos = async (username) => {
+  try {
+    const resp = await fetch(`${BASE_URL}/users/${username}`, {
+      method: "GET",
+      headers: { accept: "application/json" },
+    });
+    if (!resp.ok) throw new Error();
+    const data = await resp.json();
+    return data.todos || [];
+  } catch {
+    return [];
+  }
+};
+
+export const addTodo = async (username, label) => {
+  try {
+    const newTask = { label, is_done: false };
+    const resp = await fetch(`${BASE_URL}/todos/${username}`, {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newTask),
+    });
+    if (!resp.ok) throw new Error();
+    const data = await resp.json();
+    return data;
+  } catch {
+    return null;
+  }
+};
+
+export const deleteTodo = async (taskId) => {
+  try {
+    const resp = await fetch(`${BASE_URL}/todos/${taskId}`, {
+      method: "DELETE",
+      headers: { accept: "application/json" },
+    });
+    return resp.status === 204;
+  } catch {
+    return false;
+  }
+};
+
+export const clearAllTodos = async (username) => {
+  try {
+    const resp = await fetch(`${BASE_URL}/todos/${username}/all`, {
+      method: "DELETE",
+      headers: { accept: "application/json" },
+    });
+    return resp.status === 204;
+  } catch {
+    return false;
   }
 };
