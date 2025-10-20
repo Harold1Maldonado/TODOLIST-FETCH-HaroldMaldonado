@@ -82,13 +82,18 @@ export const deleteTodo = async (taskId) => {
   }
 };
 
-export const clearAllTodos = async (username) => {
+export const clearAllTodos = async (tasks) => {
   try {
-    const resp = await fetch(`${BASE_URL}/users/${username}/todos`, {
-      method: "DELETE",
-      headers: { accept: "application/json" },
-    });
-    return resp.status === 204;
+    if (!Array.isArray(tasks) || tasks.length === 0) return false;
+    const deletePromises = tasks.map((task) =>
+      fetch(`${BASE_URL}/todos/${task.id}`, {
+        method: "DELETE",
+        headers: { accept: "application/json" },
+      })
+    );
+    const results = await Promise.all(deletePromises);
+    const allDeleted = results.every((r) => r.status === 204);
+    return allDeleted;
   } catch {
     return false;
   }

@@ -39,20 +39,20 @@ const App = () => {
   };
 
   const handleDeleteTask = async (id) => {
-  const deleted = await deleteTodo(id);
-  if (deleted) fetchTodos();
-  else alert("No se pudo eliminar la tarea");
-};
+    const deleted = await deleteTodo(id);
+    if (deleted) fetchTodos();
+    else alert("No se pudo eliminar la tarea");
+  };
 
-const handleClearAll = async () => {
-  const cleared = await clearAllTodos(currentUser);
-  if (cleared) {
-    setTasks([]);
-  } else {
-    alert("No se pudieron eliminar todas las tareas");
-  }
-};
-
+  const handleClearAll = async () => {
+    if (tasks.length === 0) return alert("No hay tareas para eliminar");
+    const cleared = await clearAllTodos(tasks);
+    if (cleared) {
+      setTasks([]);
+    } else {
+      alert("No se pudieron eliminar todas las tareas");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -64,13 +64,16 @@ const handleClearAll = async () => {
         <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
           <TodoInput addTask={handleAddTask} />
           <TodoList tasks={tasks} deleteTask={handleDeleteTask} />
+
           {tasks.length > 0 && (
-            <button
-              onClick={handleClearAll}
-              className="mt-4 w-full bg-red-500 text-white py-2 rounded"
-            >
-              Eliminar todas las tareas
-            </button>
+            <div className="mt-4 flex justify-center">
+              <button
+                onClick={handleClearAll}
+                className="border border-gray-400 text-red-600 hover:bg-red-100 px-4 py-2 rounded"
+              >
+                Eliminar todas las tareas
+              </button>
+            </div>
           )}
         </div>
       </div>
