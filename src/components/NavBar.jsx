@@ -1,87 +1,101 @@
 import React, { useState, useEffect } from "react";
-import {
-  getAllUsers,
-  createUserIfNotExists,
-  deleteUser,
-} from "../services/todoService";
+import { getAllUsers, createUserIfNotExists, deleteUser } from "../services/todoService";
 
-const NavBar = ({ onSync, onUserChange }) => {
+const NavBar = ({ onUserChange, onSync }) => {
   const [users, setUsers] = useState([]);
   const [newUser, setNewUser] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
   const [selectedUser, setSelectedUser] = useState("");
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
 
   const fetchUsers = async () => {
     const data = await getAllUsers();
     setUsers(data);
   };
 
-  const handleCreateUser = async () => {
-    if (!newUser.trim()) return alert("Ingresa un nombre de usuario");
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!newUser.trim()) return;
+
     await createUserIfNotExists(newUser);
     setNewUser("");
+    setIsAdmin(false);
     fetchUsers();
   };
 
   const handleDeleteUser = async () => {
     if (!selectedUser) return alert("Selecciona un usuario para eliminar");
-    if (!confirm(`¿Eliminar el usuario "${selectedUser}"?`)) return;
     await deleteUser(selectedUser);
     setSelectedUser("");
     fetchUsers();
+    onUserChange("");
   };
 
-  const handleSelectChange = (e) => {
-    const username = e.target.value;
-    setSelectedUser(username);
-    onUserChange(username);
+  const handleSelect = (e) => {
+    const user = e.target.value;
+    setSelectedUser(user);
+    onUserChange(user);
   };
 
   return (
-    <nav className="w-full bg-gray-800 text-white p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-      <div className="text-lg font-semibold">ToDo Manager</div>
+    <nav className="flex flex-col md:flex-row justify-between items-center gap-3 bg-white p-4 shadow">
+      <div className="flex items-center gap-2">
+        <form onSubmit={handleSubmit} className="flex items-center gap-2">
+          <input
+            type="text"
+            placeholder="Nuevo usuario"
+            value={newUser}
+            onChange={(e) => setNewUser(e.target.value)}
+            className="border border-gray-400 rounded p-2"
+          />
 
-      <div className="flex flex-wrap items-center gap-3">
+          <label className="flex items-center gap-1 text-sm text-gray-700">
+            <input
+              type="checkbox"
+              checked={isAdmin}
+              onChange={(e) => setIsAdmin(e.target.checked)}
+              className="border border-gray-400"
+              required
+            />
+            Confirmar
+          </label>
+
+          <button
+            type="submit"
+            className="border border-gray-400 px-3 py-2 rounded hover:bg-gray-100"
+          >
+            Agregar
+          </button>
+        </form>
+      </div>
+
+      <div className="flex items-center gap-2">
         <select
           value={selectedUser}
-          onChange={handleSelectChange}
-          className="text-black px-2 py-1 border border-gray-400 rounded"
+          onChange={handleSelect}
+          className="border border-gray-400 rounded p-2"
         >
-          <option value="">Seleccionar usuario</option>
-          {users.map((u) => (
-            <option key={u.id} value={u.name}>
-              {u.name}
+          <option value="">Selecciona un usuario</option>
+          {users.map((user) => (
+            <option key={user.id} value={user.name}>
+              {user.name}
             </option>
           ))}
         </select>
 
-        <input
-          type="text"
-          placeholder="Nuevo usuario"
-          value={newUser}
-          onChange={(e) => setNewUser(e.target.value)}
-          className="px-2 py-1 border border-gray-400 text-black rounded"
-        />
-        <button
-          onClick={handleCreateUser}
-          className="bg-green-500 text-white px-3 py-1 rounded"
-        >
-          Crear
-        </button>
-
         <button
           onClick={handleDeleteUser}
-          className="bg-red-500 text-white px-3 py-1 rounded"
+          className="border border-gray-400 text-red-600 px-3 py-2 rounded hover:bg-red-100"
         >
           Eliminar
         </button>
 
         <button
           onClick={onSync}
-          className="bg-blue-500 text-white px-3 py-1 rounded"
+          className="border border-gray-400 px-3 py-2 rounded hover:bg-gray-100"
         >
           Sincronizar
         </button>
