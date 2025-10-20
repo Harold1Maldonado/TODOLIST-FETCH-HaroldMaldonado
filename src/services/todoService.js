@@ -64,8 +64,7 @@ export const addTodo = async (username, label) => {
       body: JSON.stringify(newTask),
     });
     if (!resp.ok) throw new Error();
-    const data = await resp.json();
-    return data;
+    return await resp.json();
   } catch {
     return null;
   }
@@ -85,7 +84,7 @@ export const deleteTodo = async (taskId) => {
 
 export const clearAllTodos = async (username) => {
   try {
-    const resp = await fetch(`${BASE_URL}/todos/${username}/all`, {
+    const resp = await fetch(`${BASE_URL}/users/${username}/todos`, {
       method: "DELETE",
       headers: { accept: "application/json" },
     });

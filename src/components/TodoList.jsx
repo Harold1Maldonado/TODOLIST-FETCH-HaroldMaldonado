@@ -2,9 +2,7 @@ import React from "react";
 import TodoItem from "./TodoItem";
 
 const TodoList = ({ tasks, deleteTask }) => {
-  if (!Array.isArray(tasks)) {
-    return <p className="text-red-500 text-center">Error al cargar tareas</p>;
-  }
+  if (!Array.isArray(tasks)) return null;
 
   return (
     <div className="mt-4">
@@ -16,7 +14,7 @@ const TodoList = ({ tasks, deleteTask }) => {
             <TodoItem
               key={task.id}
               task={task}
-              onDelete={() => deleteTask(task.id)}
+              onDelete={deleteTask}
             />
           ))}
         </ul>

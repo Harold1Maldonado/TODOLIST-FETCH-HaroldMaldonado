@@ -39,14 +39,20 @@ const App = () => {
   };
 
   const handleDeleteTask = async (id) => {
-    const deleted = await deleteTodo(currentUser, id);
-    if (deleted) fetchTodos();
-  };
+  const deleted = await deleteTodo(id);
+  if (deleted) fetchTodos();
+  else alert("No se pudo eliminar la tarea");
+};
 
-  const handleClearAll = async () => {
-    await clearAllTodos(currentUser);
+const handleClearAll = async () => {
+  const cleared = await clearAllTodos(currentUser);
+  if (cleared) {
     setTasks([]);
-  };
+  } else {
+    alert("No se pudieron eliminar todas las tareas");
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gray-100">
