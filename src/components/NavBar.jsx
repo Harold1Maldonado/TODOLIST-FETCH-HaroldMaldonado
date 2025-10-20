@@ -62,6 +62,7 @@ const NavBar = ({ onUserChange, onSync }) => {
               checked={isAdmin}
               onChange={(e) => setIsAdmin(e.target.checked)}
               className="border border-gray-400"
+              required
             />
             Admin
           </label>
