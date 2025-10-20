@@ -6,6 +6,7 @@ const NavBar = ({ onUserChange, onSync }) => {
   const [newUser, setNewUser] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [selectedUser, setSelectedUser] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const fetchUsers = async () => {
     const data = await getAllUsers();
@@ -28,8 +29,11 @@ const NavBar = ({ onUserChange, onSync }) => {
 
   const handleDeleteUser = async () => {
     if (!selectedUser) return alert("Selecciona un usuario para eliminar");
+    if (!confirmDelete) return alert("Debes confirmar la eliminación marcando el checkbox");
+
     await deleteUser(selectedUser);
     setSelectedUser("");
+    setConfirmDelete(false);
     fetchUsers();
     onUserChange("");
   };
@@ -58,9 +62,8 @@ const NavBar = ({ onUserChange, onSync }) => {
               checked={isAdmin}
               onChange={(e) => setIsAdmin(e.target.checked)}
               className="border border-gray-400"
-              required
             />
-            Confirmar
+            Admin
           </label>
 
           <button
@@ -85,6 +88,17 @@ const NavBar = ({ onUserChange, onSync }) => {
             </option>
           ))}
         </select>
+
+        <label className="flex items-center gap-1 text-sm text-gray-700">
+          <input
+            type="checkbox"
+            checked={confirmDelete}
+            onChange={(e) => setConfirmDelete(e.target.checked)}
+            className="border border-gray-400"
+            required
+          />
+          Confirmar eliminación
+        </label>
 
         <button
           onClick={handleDeleteUser}
